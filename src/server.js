@@ -7,17 +7,9 @@ const authRoutes = require('./routes/auth.routes');
 const customerRoutes = require('./routes/customer.routes');
 const transactionRoutes = require('./routes/transaction.routes');
 const approvalRoutes = require('./routes/approval.routes');
-
 const authenticateToken = require('./middleware/middleware');
 const authorizeRoles = require('./middleware/role.middleware');
-
 const app = express();
-
-
-// ===============================
-// CORS
-// ===============================
-
 const corsOptions = {
   origin: [
     'http://localhost:4200',
@@ -28,36 +20,14 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-
-// ===============================
-// JSON BODY PARSER
-// ===============================
-
 app.use(express.json());
-
-
-// ===============================
-// TEST API
-// ===============================
-
 app.get('/', (req, res) => {
   res.json({
     message: 'FinOps API is running'
   });
 });
 
-
-// ===============================
-// AUTH ROUTES
-// ===============================
-
 app.use('/api/auth', authRoutes);
-
-
-// ===============================
-// CUSTOMER ROUTES
-// ===============================
 
 app.use(
   '/api/customers',
@@ -65,21 +35,11 @@ app.use(
   customerRoutes
 );
 
-
-// ===============================
-// TRANSACTION ROUTES
-// ===============================
-
 app.use(
   '/api/transactions',
   authenticateToken,
   transactionRoutes
 );
-
-
-// ===============================
-// APPROVAL ROUTES
-// ===============================
 
 app.use(
   '/api/approvals',
@@ -89,9 +49,7 @@ app.use(
 );
 
 
-// ===============================
-// SERVER
-// ===============================
+
 
 const PORT = process.env.PORT || 3000;
 
