@@ -14,21 +14,33 @@ const authorizeRoles = require('./middleware/role.middleware');
 const app = express();
 
 
+// ===============================
 // CORS
-app.use(cors({
-  origin: 'https://calm-lolly-751605.netlify.app',
+// ===============================
+
+const corsOptions = {
+  origin: [
+    'http://localhost:4200',
+    'https://calm-lolly-751605.netlify.app'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
 
-app.options('*', cors());
+app.use(cors(corsOptions));
 
 
-// JSON
+// ===============================
+// JSON BODY PARSER
+// ===============================
+
 app.use(express.json());
 
 
-// Test API
+// ===============================
+// TEST API
+// ===============================
+
 app.get('/', (req, res) => {
   res.json({
     message: 'FinOps API is running'
@@ -36,8 +48,16 @@ app.get('/', (req, res) => {
 });
 
 
-// Routes
+// ===============================
+// AUTH ROUTES
+// ===============================
+
 app.use('/api/auth', authRoutes);
+
+
+// ===============================
+// CUSTOMER ROUTES
+// ===============================
 
 app.use(
   '/api/customers',
@@ -45,11 +65,21 @@ app.use(
   customerRoutes
 );
 
+
+// ===============================
+// TRANSACTION ROUTES
+// ===============================
+
 app.use(
   '/api/transactions',
   authenticateToken,
   transactionRoutes
 );
+
+
+// ===============================
+// APPROVAL ROUTES
+// ===============================
 
 app.use(
   '/api/approvals',
@@ -59,7 +89,10 @@ app.use(
 );
 
 
-// Server
+// ===============================
+// SERVER
+// ===============================
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, '0.0.0.0', () => {
