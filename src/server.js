@@ -1,25 +1,34 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
+
 const authRoutes = require('./routes/auth.routes');
 const customerRoutes = require('./routes/customer.routes');
+const transactionRoutes = require('./routes/transaction.routes');
+const approvalRoutes = require('./routes/approval.routes');
+
 const authenticateToken = require('./middleware/middleware');
+const authorizeRoles = require('./middleware/role.middleware');
 
 const app = express();
-const transactionRoutes =
-  require('./routes/transaction.routes');
-  const approvalRoutes =
-  require('./routes/approval.routes');
+
+
+// CORS
 app.use(cors({
-  origin: 'http://localhost:4200'
+  origin: 'https://calm-lolly-751605.netlify.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-const authorizeRoles =
-  require('./middleware/role.middleware');
+app.options('*', cors());
 
+
+// JSON
 app.use(express.json());
 
 
-// Root API
+// Test API
 app.get('/', (req, res) => {
   res.json({
     message: 'FinOps API is running'
@@ -27,39 +36,30 @@ app.get('/', (req, res) => {
 });
 
 
-// Authentication
+// Routes
 app.use('/api/auth', authRoutes);
 
-
-// Protected Customer APIs
 app.use(
   '/api/customers',
   authenticateToken,
   customerRoutes
 );
 
-// transactions
 app.use(
   '/api/transactions',
   authenticateToken,
   transactionRoutes
 );
-// app.use(
-//   '/api/approvals',
-//   authenticateToken,
-//   approvalRoutes
-// );
+
 app.use(
   '/api/approvals',
   authenticateToken,
   authorizeRoles('Admin', 'Manager'),
   approvalRoutes
 );
-// Start server
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
 
+
+// Server
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, '0.0.0.0', () => {
